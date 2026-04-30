@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, NgZone, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -30,6 +30,8 @@ import { CartService } from '../../core/services/cart.service';
   styleUrl: './catalogo.css'
 })
 export class Catalogo implements OnInit {
+
+  @ViewChild('productsArea') productsArea!: ElementRef;
 
   productos: Producto[] = [];
 
@@ -67,7 +69,7 @@ export class Catalogo implements OnInit {
     private ngZone: NgZone,
     private route: ActivatedRoute,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.verificarUsuario();
@@ -207,9 +209,9 @@ export class Catalogo implements OnInit {
 
         setTimeout(() => {
           this.cdr.detectChanges();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          document.body.scrollTop = 0;
         });
-
-        window.scrollTo({ top: 0, behavior: 'smooth' });
       },
       error: () => {
         this.isLoading = false;
