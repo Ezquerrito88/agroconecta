@@ -156,13 +156,11 @@ class OrderController extends Controller
                 Product::where('id', $item['product_id'])->decrement('stock_quantity', $item['quantity']);
             }
 
-            // CARGA DE RELACIONES PARA EL CORREO
             $newOrder->load('buyer', 'farmer', 'items.product');
 
             return $newOrder;
         });
 
-        // ENVÃO DE CORREO AL COMPRADOR CON RESEND
         if ($order->buyer && $order->buyer->email) {
             try {
                 Mail::to($order->buyer->email)->send(new ReciboCompra($order));

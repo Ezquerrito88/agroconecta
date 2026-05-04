@@ -31,10 +31,6 @@ class FavoriteController extends Controller
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
-
-        // Obtenemos los favoritos del usuario.
-        // Usamos 'with' para traer también las imágenes y el agricultor 
-        // (así la tarjeta del producto se ve completa con foto y nombre)
         $favorites = $user->favorites()->with(['images', 'farmer.user'])->get();
 
         return response()->json($favorites);

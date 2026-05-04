@@ -12,14 +12,12 @@ class DashboardController extends Controller
 {
     public function farmerStats(Request $request)
     {
-        // 1. Identificación y Variables de Tiempo
         $user      = $request->user();
         $farmerId  = $user->farmer?->id ?? $user->id;
         $now       = Carbon::now();
         $thisYear  = $now->year;
         $prevYear  = $now->year - 1;
 
-        // 2. Detección Dinámica de URL (Azure vs Local)
         $disk = config('filesystems.default', 'public');
         if ($disk === 'azure') {
             $account = config('filesystems.disks.azure.name');
@@ -29,9 +27,6 @@ class DashboardController extends Controller
             $baseUrl = asset('storage/') . '/';
         }
 
-        // ══════════════════════════════════════════════
-        //  KPIs (Ventas, Pedidos, Calificación)
-        // ══════════════════════════════════════════════
 
         $pedidos = DB::table('orders')
             ->where('farmer_id', $farmerId)
@@ -60,9 +55,6 @@ class DashboardController extends Controller
             ->where('products.farmer_id', $farmerId)
             ->avg('reviews.rating') ?? 0;
 
-        // ══════════════════════════════════════════════
-        //  INGRESOS MENSUALES (Año actual)
-        // ══════════════════════════════════════════════
 
         $monthlyRevenue = DB::table('order_items')
             ->join('products', 'order_items.product_id', '=', 'products.id')
@@ -80,9 +72,6 @@ class DashboardController extends Controller
             ->orderByRaw('YEAR(orders.created_at), MONTH(orders.created_at)')
             ->get();
 
-        // ══════════════════════════════════════════════
-        //  INGRESOS AÑO ANTERIOR
-        // ══════════════════════════════════════════════
 
         $prevYearRevenue = DB::table('order_items')
             ->join('products', 'order_items.product_id', '=', 'products.id')
@@ -98,9 +87,6 @@ class DashboardController extends Controller
             ->get()
             ->keyBy('month');
 
-        // ══════════════════════════════════════════════
-        //  STOCK BAJO (Evitando duplicados con Subquery)
-        // ══════════════════════════════════════════════
 
         $lowStock = DB::table('products')
             ->where('farmer_id', $farmerId)
@@ -122,9 +108,6 @@ class DashboardController extends Controller
                 return $p;
             });
 
-        // ══════════════════════════════════════════════
-        //  TOP PRODUCTOS (Evitando duplicados con Subquery)
-        // ══════════════════════════════════════════════
 
         $topProducts = DB::table('order_items')
             ->join('products', 'order_items.product_id', '=', 'products.id')
@@ -150,9 +133,6 @@ class DashboardController extends Controller
                 return $p;
             });
 
-        // ══════════════════════════════════════════════
-        //  MAPA DE CALOR, DISPERSIÓN Y CATEGORÍAS
-        // ══════════════════════════════════════════════
 
         $heatmap = DB::table('orders')
             ->where('farmer_id', $farmerId)
@@ -183,9 +163,6 @@ class DashboardController extends Controller
             ->orderByRaw('MONTH(orders.created_at)')
             ->get();
 
-        // ══════════════════════════════════════════════
-        //  RESPUESTA FINAL
-        // ══════════════════════════════════════════════
 
         return response()->json([
             'kpis' => [

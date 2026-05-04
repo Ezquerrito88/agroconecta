@@ -14,7 +14,6 @@ class FarmerProfileController extends Controller
     {
         $user = Auth::user();
 
-        // ← Usar role en vez de is_farmer (que no existe en User)
         if ($user->role !== 'farmer') {
             return response()->json(['error' => 'No autorizado'], 403);
         }
@@ -22,7 +21,6 @@ class FarmerProfileController extends Controller
         $profile = Farmer::where('user_id', $user->id)->first();
 
         return response()->json([
-            // ← Devolver null explícito si no existe, no (object)[]
             'profile' => $profile ?? null
         ]);
     }

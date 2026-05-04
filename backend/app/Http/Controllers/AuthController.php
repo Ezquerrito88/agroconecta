@@ -85,7 +85,6 @@ class AuthController extends Controller
     {
         $role = $request->query('role', 'buyer');
 
-        // Guardamos el rol en sesión antes de ir a Google
         session(['google_intended_role' => $role]);
 
         return Socialite::driver('google')->redirect();
@@ -99,17 +98,14 @@ class AuthController extends Controller
         try {
             $googleUser = Socialite::driver('google')->user();
 
-            // Recuperamos el rol de la sesión y limpiamos
             $intendedRole = session('google_intended_role', 'buyer');
             session()->forget('google_intended_role');
 
-            // Buscar usuario existente por email o google_id
             $user = User::where('email', $googleUser->getEmail())
                         ->orWhere('google_id', $googleUser->getId())
                         ->first();
 
             if (!$user) {
-                // Usuario nuevo: crear con el rol elegido
                 $user = User::create([
                     'name'      => $googleUser->getName(),
                     'email'     => $googleUser->getEmail(),
@@ -122,7 +118,6 @@ class AuthController extends Controller
                     $this->createFarmerProfile($user->id);
                 }
             } else {
-                // Usuario existente: solo actualizamos google_id, NUNCA el rol
                 $user->update(['google_id' => $googleUser->getId()]);
             }
 

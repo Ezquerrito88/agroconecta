@@ -93,7 +93,6 @@ class AdminUserController extends Controller
             'address'   => 'nullable|string|max:500',
             'is_active' => 'required|boolean',
             'password'  => 'nullable|string|min:8',
-            // Campos farmer (opcionales, solo se usan si role=farmer)
             'farm_name'   => 'nullable|string|max:255',
             'city'        => 'nullable|string|max:255',
             'is_verified' => 'nullable|boolean',

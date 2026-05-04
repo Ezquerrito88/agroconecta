@@ -87,7 +87,7 @@ class AdminProductController extends Controller
             'season_end',
             'category_id',
             'moderation_status',
-            'rejection_reason',  // ← AÑADIDO
+            'rejection_reason',
         ]));
 
         // Limpiar rejection_reason si se aprueba
@@ -109,7 +109,6 @@ class AdminProductController extends Controller
 
         $images = [];
         foreach ($request->file('images', []) as $file) {
-            // Guardamos en el disco activo (Local -> storage, Azure -> Cloud)
             $path = $file->store("products/{$id}", $disk);
 
             $image = $product->images()->create([
@@ -145,7 +144,7 @@ class AdminProductController extends Controller
         $product = Product::findOrFail($id);
         $product->update([
             'moderation_status' => 'approved',
-            'rejection_reason'  => null,  // ← limpia el motivo al aprobar
+            'rejection_reason'  => null,
         ]);
 
         return response()->json([
